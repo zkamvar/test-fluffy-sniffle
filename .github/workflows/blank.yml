@@ -47,7 +47,7 @@ jobs:
           {
             echo "ok<<EOF"
             echo "["
-            for i in $(ls ${{ runner.tmp }}/out*); do
+            for i in $(ls ${{ runner.temp }}/out*); do
               echo "$i,"
               echo
             done
