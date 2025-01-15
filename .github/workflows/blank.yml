@@ -1,6 +1,9 @@
 # This is a basic workflow to help you get started with Actions
 
 name: CI
+defaults:
+  run:
+    shell: bash
 
 # Controls when the workflow will run
 on:
@@ -19,7 +22,9 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        thing: [1, 2, 3, 4, 5]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -27,10 +32,33 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          if [[ ${{ matrix.thing }} != 4 ]]; then
+            echo Hello, world! > ${{ runner.temp }}/out-${{ matrix.thing }}.txt
+          fi
+  get-things:
+    needs: [build]
+    outputs:
+      mat: ${{ fromJSON(steps.list.outputs.ok) }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: list
+        run: |
+          {
+            echo "ok<<EOF"
+            echo "["
+            for i in $(ls ${{ runner.tmp }}/out*); do
+              echo "$i,"
+              echo
+            done
+            echo "]"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+  show-things:
+    needs: [get-things]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        thang: ${{ needs.outputs.get-things.mat }}
+    steps:
+      - run: echo ${{ matrix.thang }}
