@@ -50,6 +50,7 @@ jobs:
           the_bad_thing=4
           if [[ ${{ matrix.thing.a }} == "$the_bad_thing" ]]; then
             echo "ok=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
           echo '${{ env.ITEM }}'
           file="out-${{ env.THING }}-thing"
