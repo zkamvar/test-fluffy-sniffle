@@ -54,7 +54,6 @@ jobs:
           {
             echo '${{ toJSON(matrix.thing) }}'
           } > "$file"
-          cat "$file"
           echo "ok=true" >> "$GITHUB_OUTPUT"
       # Conditionally upload the artifact if it was created
       - uses: actions/upload-artifact@v4
@@ -85,13 +84,10 @@ jobs:
         run: |
           res=(results/*)
           cat ${res[0]}
-          jq '.' results/* | jq -s .
           {
             echo "ok<<EOF"
+            # combine the files in results into one array
             jq '.' results/* | jq -s .
-            # # https://stackoverflow.com/a/26809318
-            # results=(results/*)
-            # printf '%s\n' "${results[@]/results\/out-/}" | jq -R . | jq -s .
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
   # STEP 3: use the output from the get-things job to run a subset matrix for
