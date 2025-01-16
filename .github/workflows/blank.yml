@@ -66,6 +66,7 @@ jobs:
             echo "ok<<EOF"
             echo "["
             for item in ${results[@]}; do
+              item='"'"$item"'"'
               # append a comma if it's not the last item
               if [[ "$item" != "$last" ]]; then
                 item="$item,"
@@ -75,6 +76,7 @@ jobs:
             echo "]"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
+      - run: echo "${{ steps.list.outputs.ok }}"
   show-things:
     needs: [get-things]
     runs-on: ubuntu-latest
