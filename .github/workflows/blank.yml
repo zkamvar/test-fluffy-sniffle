@@ -52,6 +52,9 @@ jobs:
             echo "ok=false" >> "$GITHUB_OUTPUT"
           fi
           printf "%s" "${{ env.ITEM }}"
+          echo "${{ toJSON(job) }}" > jeorb
+          cat jeorb
+          jq < jeorb
           file="out-${{ env.THING }}-thing"
           {
           printf "%s" "${{ env.ITEM }}"
