@@ -32,28 +32,49 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
+        id: run
         run: |
           if [[ ${{ matrix.thing }} != 4 ]]; then
-            echo Hello, world! > ${{ runner.temp }}/out-${{ matrix.thing }}.txt
+            echo Hello, world! > out-${{ matrix.thing }}
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
           fi
+      - uses: actions/upload-artifact@v4
+        if: ${{ fromJSON(steps.run.outputs.ok) }}
+        with:
+          name: status-${{ matrix.thing }}
+          path: out-${{ matrix.thing }}
   get-things:
     needs: [build]
     outputs:
       mat: ${{ fromJSON(steps.list.outputs.ok) }}
     runs-on: ubuntu-latest
     steps:
+      - id: fetch-artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: results
+          pattern: status-*
+          merge-multiple: true
       - id: list
         run: |
+          # fetch the array of results
+          results=(results/*)
+          last=${results[${#results[@]}-1]/results\/out-/}
           {
             echo "ok<<EOF"
             echo "["
-            for i in $(ls ${{ runner.temp }}); do
-              echo "$i,"
-              echo
+            for item in ${results[@]}; do
+              # append a comma if it's not the last item
+              if [[ "$item" != "$last" ]]; then
+                item="$item,"
+              fi
+              echo "$item" >> $GITHUB_OUTPUT
             done
             echo "]"
             echo "EOF"
-          } >> $GITHUB_OUTPUT
+          } >> "$GITHUB_OUTPUT"
   show-things:
     needs: [get-things]
     runs-on: ubuntu-latest
