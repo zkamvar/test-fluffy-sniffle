@@ -45,7 +45,7 @@ jobs:
       - name: Record output status
         id: run
         env:
-          ITEM: ${{ toJSON(matrix.thing) }}
+          ITEM: ${{ matrix.thing }}
         run: |
           the_bad_thing=4
           if [[ ${{ matrix.thing.a }} == "$the_bad_thing" ]]; then
