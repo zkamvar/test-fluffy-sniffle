@@ -55,6 +55,7 @@ jobs:
             echo "${{ toJSON(matrix.thing) }}"
             echo "EOF"
           } > "$file"
+          cat "$file"
           echo "ok=true" >> "$GITHUB_OUTPUT"
       # Conditionally upload the artifact if it was created
       - uses: actions/upload-artifact@v4
