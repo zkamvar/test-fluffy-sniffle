@@ -59,13 +59,11 @@ jobs:
           merge-multiple: true
       - id: list
         run: |
-          # https://stackoverflow.com/a/26809318
-          results=(results/*)
-          printf '%s\n' "${results[@]/results\/out-/}" | jq -R . | jq -s . \
-          > ${{ runner.temp }}/ok.txt
           {
             echo "ok<<EOF"
-            cat ${{ runner.temp }}/ok.txt
+            # https://stackoverflow.com/a/26809318
+            results=(results/*)
+            printf '%s\n' "${results[@]/results\/out-/}" | jq -R . | jq -s .
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
       - run: echo "${{ steps.list.outputs.ok }}"
