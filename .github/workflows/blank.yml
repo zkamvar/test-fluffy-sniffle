@@ -52,7 +52,7 @@ jobs:
           file="out-${{ env.THING }}-thing"
           {
             echo "<<EOF"
-            printf "%s" $(jq < "${{ toJSON(matrix.thing) }}")
+            echo "${{ toJSON(matrix.thing) }}"
             echo "EOF"
           } > "$file"
           echo "ok=true" >> "$GITHUB_OUTPUT"
