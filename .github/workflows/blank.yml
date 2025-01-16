@@ -48,7 +48,7 @@ jobs:
   get-things:
     needs: [build]
     outputs:
-      mat: ${{ fromJSON(steps.list.outputs.ok) }}
+      mat: ${{ steps.list.outputs.ok }}
     runs-on: ubuntu-latest
     steps:
       - id: fetch-artifacts
@@ -80,6 +80,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        thang: ${{ needs.outputs.get-things.mat }}
+        thang: ${{ fromJSON(needs.outputs.get-things.mat) }}
     steps:
       - run: echo ${{ matrix.thang }}
