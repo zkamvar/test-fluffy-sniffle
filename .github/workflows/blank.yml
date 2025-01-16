@@ -74,6 +74,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        thang: ${{ fromJSON(needs.outputs.get-things.mat) }}
+        thang: ${{ fromJSON(needs.get-things.outputs.mat) }}
     steps:
       - run: echo ${{ matrix.thang }}
