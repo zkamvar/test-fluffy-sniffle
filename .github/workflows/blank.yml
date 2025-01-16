@@ -44,15 +44,17 @@ jobs:
       # should be uploaded as an artifact.
       - name: Record output status
         id: run
+        env:
+          ITEM: ${{ toJSON(matrix.thing) }}
         run: |
           the_bad_thing=4
           if [[ ${{ matrix.thing.a }} == "$the_bad_thing" ]]; then
             echo "ok=false" >> "$GITHUB_OUTPUT"
           fi
-          echo "${{ toJSON(matrix.thing) }}" | jq -Rr
+          echo "${{ env.ITEM }}"
           file="out-${{ env.THING }}-thing"
           {
-          echo "${{ toJSON(matrix.thing) }}" | jq -Rr
+          echo "${{ env.ITEM }}"
           } > "$file"
           cat "$file"
           echo "ok=true" >> "$GITHUB_OUTPUT"
