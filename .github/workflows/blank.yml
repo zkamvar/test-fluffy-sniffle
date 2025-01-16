@@ -35,7 +35,7 @@ jobs:
         id: run
         run: |
           if [[ ${{ matrix.thing }} != 4 ]]; then
-            echo Hello, world! > out-${{ matrix.thing }}-thing
+            touch out-${{ matrix.thing }}-thing
             echo "ok=true" >> "$GITHUB_OUTPUT"
           else
             echo "ok=false" >> "$GITHUB_OUTPUT"
