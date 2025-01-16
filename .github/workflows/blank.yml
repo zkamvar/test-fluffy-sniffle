@@ -49,10 +49,10 @@ jobs:
           if [[ ${{ matrix.thing.a }} == "$the_bad_thing" ]]; then
             echo "ok=false" >> "$GITHUB_OUTPUT"
           fi
-          printf "%s" "${{ toJSON(matrix.thing) }}" | jq -R
+          echo "${{ toJSON(matrix.thing) }}" | jq -Rr
           file="out-${{ env.THING }}-thing"
           {
-          printf "%s" "${{ toJSON(matrix.thing) }}" | jq -R
+          echo "${{ toJSON(matrix.thing) }}" | jq -Rr
           } > "$file"
           cat "$file"
           echo "ok=true" >> "$GITHUB_OUTPUT"
