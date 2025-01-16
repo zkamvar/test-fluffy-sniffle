@@ -61,19 +61,9 @@ jobs:
         run: |
           # fetch the array of results
           results=(results/*)
-          last='"'"${results[${#results[@]}-1]/results\/out-/}"'"'
           {
             echo "ok<<EOF"
-            echo "["
-            for i in ${results[@]}; do
-              item='"'"${i/results\/out-/}"'"'
-              # append a comma if it's not the last item
-              if [[ "$item" != "$last" ]]; then
-                item="$item,"
-              fi
-              echo "$item" >> $GITHUB_OUTPUT
-            done
-            echo "]"
+            printf '%s\n' "${results[@]/results\/out-/}" | jq -R . | jq -s .
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
       - run: echo "${{ steps.list.outputs.ok }}"
