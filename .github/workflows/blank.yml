@@ -44,7 +44,7 @@ jobs:
         if: ${{ fromJSON(steps.run.outputs.ok) }}
         with:
           name: status-${{ matrix.thing }}
-          path: out-${{ matrix.thing }}
+          path: out-${{ matrix.thing }}-thing
   get-things:
     needs: [build]
     outputs:
