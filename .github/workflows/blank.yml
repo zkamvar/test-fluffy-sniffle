@@ -65,8 +65,8 @@ jobs:
           {
             echo "ok<<EOF"
             echo "["
-            for item in ${results[@]}; do
-              item='"'"$item"'"'
+            for i in ${results[@]}; do
+              item='"'"${i/results\/out-/}"'"'
               # append a comma if it's not the last item
               if [[ "$item" != "$last" ]]; then
                 item="$item,"
