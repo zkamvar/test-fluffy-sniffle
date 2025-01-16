@@ -62,9 +62,8 @@ jobs:
           # fetch the array of results
           results=(results/*)
           {
-            echo "ok<<EOF"
+            # https://stackoverflow.com/a/26809318
             printf '%s\n' "${results[@]/results\/out-/}" | jq -R . | jq -s .
-            echo "EOF"
           } >> "$GITHUB_OUTPUT"
       - run: echo "${{ steps.list.outputs.ok }}"
   show-things:
