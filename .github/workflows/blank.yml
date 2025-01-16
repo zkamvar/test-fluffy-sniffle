@@ -51,9 +51,7 @@ jobs:
           fi
           file="out-${{ env.THING }}-thing"
           {
-            echo "<<EOF"
             echo "${{ toJSON(matrix.thing) }}"
-            echo "EOF"
           } > "$file"
           cat "$file"
           echo "ok=true" >> "$GITHUB_OUTPUT"
