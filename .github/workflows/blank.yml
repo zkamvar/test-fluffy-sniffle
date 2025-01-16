@@ -84,6 +84,8 @@ jobs:
       - id: list
         run: |
           {
+            res=(results/*)
+            cat ${res[0]}
             jq '.' results/* | jq -s .
             echo "ok<<EOF"
             jq '.' results/* | jq -s .
