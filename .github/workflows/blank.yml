@@ -35,7 +35,7 @@ jobs:
         id: run
         run: |
           if [[ ${{ matrix.thing }} != 4 ]]; then
-            echo Hello, world! > out-${{ matrix.thing }}
+            echo Hello, world! > out-${{ matrix.thing }}-thing
             echo "ok=true" >> "$GITHUB_OUTPUT"
           else
             echo "ok=false" >> "$GITHUB_OUTPUT"
@@ -61,7 +61,7 @@ jobs:
         run: |
           # fetch the array of results
           results=(results/*)
-          last=${results[${#results[@]}-1]/results\/out-/}
+          last='"'"${results[${#results[@]}-1]/results\/out-/}"'"'
           {
             echo "ok<<EOF"
             echo "["
