@@ -16,35 +16,59 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
+  # STEP 1: Run an optional process in a matrix where items may fail
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        thing: [1, 2, 3, 4, 5]
-    # Steps represent a sequence of tasks that will be executed as part of the job
+        thing: [
+          {"a": "1", "b": "1-b"},
+          {"a": "2", "b": "2-b"},
+          {"a": "3", "b": "3-b"},
+          {"a": "4", "b": "4-b"},
+          {"a": "5", "b": "5-b"}
+        ]
+    env:
+      THING: ${{ matrix.thing.a }}-${{ matrix.thing.b }}
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
+      # An example of recording the output status of a run. There are two parts
+      # to this: 
+      #
+      # 1. the file: `out-${{ matrix.thing }}-thing` is a file that
+      #    is created when the run is successful
+      # 2. the output: `ok`, which is `true` on success and `false` otherwise
+      #
+      # We pass the output (2) to the next step to determine if the file (1)
+      # should be uploaded as an artifact.
+      - name: Record output status
         id: run
         run: |
-          if [[ ${{ matrix.thing }} != 4 ]]; then
-            touch out-${{ matrix.thing }}-thing
-            echo "ok=true" >> "$GITHUB_OUTPUT"
-          else
+          the_bad_thing=4
+          if [[ ${{ matrix.thing.a }} == "$the_bad_thing" ]]; then
             echo "ok=false" >> "$GITHUB_OUTPUT"
           fi
+          file="out-${{ env.THING }}-thing"
+          {
+            echo "<<EOF"
+            echo "${{ matrix.thing }}"
+            echo "EOF"
+          } > "$file"
+          echo "ok=true" >> "$GITHUB_OUTPUT"
+      # Conditionally upload the artifact if it was created
       - uses: actions/upload-artifact@v4
         if: ${{ fromJSON(steps.run.outputs.ok) }}
         with:
-          name: status-${{ matrix.thing }}
-          path: out-${{ matrix.thing }}-thing
+          name: status-${{ env.THING }}
+          path: out-${{ env.THING }}-thing
+          retention-days: 1
+  # STEP 2: create output of previous matrix runs that were successful
+  # 
+  # If the previous matrix runs were successful, then they will appear as
+  # an artifact from the build job. We can download these artifacts into
+  # a single folder and then use this list to create the inputs for the next
+  # job
   get-things:
     needs: [build]
     outputs:
@@ -60,13 +84,16 @@ jobs:
       - id: list
         run: |
           {
+            jq '.' results/* | jq -s .
             echo "ok<<EOF"
-            # https://stackoverflow.com/a/26809318
-            results=(results/*)
-            printf '%s\n' "${results[@]/results\/out-/}" | jq -R . | jq -s .
+            jq '.' results/* | jq -s .
+            # # https://stackoverflow.com/a/26809318
+            # results=(results/*)
+            # printf '%s\n' "${results[@]/results\/out-/}" | jq -R . | jq -s .
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
-      - run: echo "${{ steps.list.outputs.ok }}"
+  # STEP 3: use the output from the get-things job to run a subset matrix for
+  # this job.
   show-things:
     needs: [get-things]
     runs-on: ubuntu-latest
